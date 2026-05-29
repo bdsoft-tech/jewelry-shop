@@ -1,0 +1,9 @@
+Node.js fs rename failed after 101 retries with error Error: EPERM: operation not permitted, rename 'D:\web\Company Product\Personal Shop\jewelry-shop\.next\dev\server\server-reference-manifest.js.tmp.qohk6hpjk5' -> 'D:\web\Company Product\Personal Shop\jewelry-shop\.next\dev\server\server-reference-manifest.js'
+Error: EPERM: operation not permitted, rename 'D:\web\Company Product\Personal Shop\jewelry-shop\.next\dev\server\server-reference-manifest.js.tmp.qohk6hpjk5' -> 'D:\web\Company Product\Personal Shop\jewelry-shop\.next\dev\server\server-reference-manifest.js'
+    at ignore-listed frames {
+  errno: -4048,
+  code: 'EPERM',
+  syscall: 'rename',
+  path: 'D:\\web\\Company Product\\Personal Shop\\jewelry-shop\\.next\\dev\\server\\server-reference-manifest.js.tmp.qohk6hpjk5',
+  dest: 'D:\\web\\Company Product\\Personal Shop\\jewelry-shop\\.next\\dev\\server\\server-reference-manifest.js'
+}

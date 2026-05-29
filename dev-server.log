@@ -1,0 +1,10 @@
+
+> jewelry-shop@0.1.0 dev D:\web\Company Product\Personal Shop\jewelry-shop
+> next dev "--hostname" "127.0.0.1" "--port" "3000"
+
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+✓ Ready in 469ms
+[?25h
+ ELIFECYCLE  Command failed with exit code 1.
