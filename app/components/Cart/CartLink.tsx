@@ -11,7 +11,7 @@ export default function CartLink() {
   return (
     <Link
       href="/cart"
-      className="relative flex h-10 items-center gap-2 rounded-md bg-[#1f2a24] px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#2d3b33] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d7b56d]"
+      className="relative flex h-10 items-center justify-center gap-2 rounded-md bg-[#1f2a24] px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#2d3b33] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d7b56d] sm:justify-start"
       aria-label={`Shopping bag with ${displayQuantity} item${
         displayQuantity === 1 ? "" : "s"
       }`}

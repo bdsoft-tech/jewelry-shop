@@ -54,11 +54,11 @@ export default function CartContents() {
 
   if (!hydrated) {
     return (
-      <section className="mx-auto max-w-3xl rounded-lg border border-stone-200 bg-white p-8 text-center shadow-sm">
+      <section className="mx-auto max-w-3xl rounded-lg border border-stone-200 bg-white p-6 text-center shadow-sm sm:p-8">
         <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-md bg-[#1f2a24] text-[#d7b56d]">
           <ShoppingBag size={26} aria-hidden="true" />
         </span>
-        <h1 className="mt-6 text-4xl font-semibold text-[#1f2a24]">
+        <h1 className="mt-6 text-3xl font-semibold text-[#1f2a24] sm:text-4xl">
           Loading your bag
         </h1>
       </section>
@@ -67,11 +67,11 @@ export default function CartContents() {
 
   if (cartRows.length === 0) {
     return (
-      <section className="mx-auto max-w-3xl rounded-lg border border-stone-200 bg-white p-8 text-center shadow-sm">
+      <section className="mx-auto max-w-3xl rounded-lg border border-stone-200 bg-white p-6 text-center shadow-sm sm:p-8">
         <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-md bg-[#1f2a24] text-[#d7b56d]">
           <ShoppingBag size={26} aria-hidden="true" />
         </span>
-        <h1 className="mt-6 text-4xl font-semibold text-[#1f2a24]">
+        <h1 className="mt-6 text-3xl font-semibold text-[#1f2a24] sm:text-4xl">
           Your bag is ready for something beautiful.
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-base leading-8 text-stone-700">
@@ -90,14 +90,14 @@ export default function CartContents() {
   }
 
   return (
-    <section className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1fr_360px]">
+    <section className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
       <div className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-4 border-b border-stone-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8b1e3f]">
               Shopping bag
             </p>
-            <h1 className="mt-3 text-4xl font-semibold text-[#1f2a24]">
+            <h1 className="mt-3 text-3xl font-semibold text-[#1f2a24] sm:text-4xl">
               Your selected pieces
             </h1>
           </div>
@@ -115,7 +115,7 @@ export default function CartContents() {
           {cartRows.map(({ product, quantity, lineTotal }) => (
             <article
               key={product.id}
-              className="grid gap-4 py-5 sm:grid-cols-[120px_1fr] sm:gap-5"
+              className="grid gap-4 py-5 sm:grid-cols-[120px_minmax(0,1fr)] sm:gap-5"
             >
               <Link
                 href={getProductHref(product)}
@@ -132,7 +132,7 @@ export default function CartContents() {
                 />
               </Link>
 
-              <div className="grid gap-4 md:grid-cols-[1fr_auto]">
+              <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto]">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8b6d2f]">
                     {getCategoryName(categories, product.categoryId)}
@@ -156,8 +156,8 @@ export default function CartContents() {
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between gap-4 md:flex-col md:items-end">
-                  <p className="text-lg font-semibold text-[#1f2a24]">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between md:flex-col md:items-end">
+                  <p className="text-base font-semibold text-[#1f2a24] sm:text-lg">
                     {formatPrice(product.price)}
                   </p>
                   <div className="flex items-center overflow-hidden rounded-md border border-stone-300">
@@ -191,7 +191,7 @@ export default function CartContents() {
         </div>
       </div>
 
-      <aside className="h-fit rounded-lg border border-stone-200 bg-white p-6 shadow-sm">
+      <aside className="h-fit rounded-lg border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
         <h2 className="text-2xl font-semibold text-[#1f2a24]">Order summary</h2>
         <div className="mt-6 space-y-4 text-sm text-stone-700">
           <div className="flex items-center justify-between gap-4">

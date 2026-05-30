@@ -55,7 +55,7 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
         ) : null}
       </div>
 
-      <div className="space-y-4 p-5">
+      <div className="space-y-4 p-4 sm:p-5">
         <div className="flex items-center justify-between gap-4">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8b6d2f]">
             {getCategoryName(categories, product.categoryId)}
@@ -68,7 +68,7 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
         <div>
           <Link
             href={productHref}
-            className="block text-xl font-semibold text-[#1f2a24] transition hover:text-[#8b1e3f]"
+            className="block text-lg font-semibold text-[#1f2a24] transition hover:text-[#8b1e3f] sm:text-xl"
           >
             {product.name}
           </Link>
@@ -76,14 +76,14 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
             {product.shortDescription}
           </p>
         </div>
-        <div className="flex items-center justify-between gap-4 border-t border-stone-100 pt-4">
-          <span className="text-lg font-semibold text-[#1f2a24]">
+        <div className="flex flex-col gap-3 border-t border-stone-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <span className="text-base font-semibold text-[#1f2a24] sm:text-lg">
             {formatPrice(product.price)}
           </span>
           {product.price === null ? (
             <Link
               href={productHref}
-              className="inline-flex h-10 items-center justify-center rounded-md border border-stone-300 px-3 text-sm font-semibold text-[#1f2a24] transition hover:border-[#8b1e3f] hover:text-[#8b1e3f]"
+              className="inline-flex h-10 w-full items-center justify-center rounded-md border border-stone-300 px-3 text-sm font-semibold text-[#1f2a24] transition hover:border-[#8b1e3f] hover:text-[#8b1e3f] sm:w-auto"
             >
               Inquire
             </Link>
@@ -91,7 +91,7 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
             <AddToCartButton
               productId={product.id}
               productName={product.name}
-              className="h-10 px-3"
+              className="h-10 w-full px-3 sm:w-auto"
             >
               Add
             </AddToCartButton>

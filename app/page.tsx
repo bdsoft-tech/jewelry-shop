@@ -52,7 +52,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-20 sm:py-24" aria-labelledby="new-products-heading">
+      <section className="py-16 sm:py-24" aria-labelledby="new-products-heading">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
@@ -61,7 +61,7 @@ export default function Home() {
               </p>
               <h2
                 id="new-products-heading"
-                className="mt-4 text-4xl font-semibold text-[#1f2a24] sm:text-5xl"
+                className="mt-4 text-3xl font-semibold text-[#1f2a24] sm:text-4xl lg:text-5xl"
               >
                 Fresh pieces, arranged like a private preview.
               </h2>
@@ -85,7 +85,7 @@ export default function Home() {
                 (product, index) => (
                   <div
                     key={product.id}
-                    className="w-[18rem] shrink-0 snap-start sm:w-[20rem] lg:w-[22rem]"
+                    className="w-[15rem] shrink-0 snap-start sm:w-[18rem] lg:w-[22rem]"
                   >
                     <ProductCard product={product} priority={index === 0} />
                   </div>
@@ -97,7 +97,7 @@ export default function Home() {
       </section>
 
       {/* Featured products section */}
-      <section className="py-20 sm:py-24" aria-labelledby="featured-heading">
+      <section className="py-16 sm:py-24" aria-labelledby="featured-heading">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>
@@ -106,7 +106,7 @@ export default function Home() {
               </p>
               <h2
                 id="featured-heading"
-                className="mt-4 max-w-2xl text-4xl font-semibold text-[#1f2a24] sm:text-5xl"
+                className="mt-4 max-w-2xl text-3xl font-semibold text-[#1f2a24] sm:text-4xl lg:text-5xl"
               >
                 Designed for every light you step into.
               </h2>
@@ -136,7 +136,7 @@ export default function Home() {
 
       {/* Atelier standards section */}
       <section
-        className="bg-[#f7f1e8] py-20 sm:py-24"
+        className="bg-[#f7f1e8] py-16 sm:py-24"
         aria-labelledby="atelier-heading"
       >
         <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
@@ -146,7 +146,7 @@ export default function Home() {
             </p>
             <h2
               id="atelier-heading"
-              className="mt-4 text-4xl font-semibold text-[#1f2a24] sm:text-5xl"
+              className="mt-4 text-3xl font-semibold text-[#1f2a24] sm:text-4xl lg:text-5xl"
             >
               Quiet luxury, engineered with intent.
             </h2>

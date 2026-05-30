@@ -318,14 +318,14 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#fbfaf7] px-4 py-12 sm:px-6 lg:px-8">
-      <section className="mx-auto max-w-7xl space-y-10">
+    <main className="min-h-screen bg-[#fbfaf7] px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+      <section className="mx-auto max-w-7xl space-y-8 sm:space-y-10">
         <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8b1e3f]">
               Admin demo
             </p>
-            <h1 className="mt-4 text-4xl font-semibold text-[#1f2a24]">
+            <h1 className="mt-4 text-3xl font-semibold text-[#1f2a24] sm:text-4xl">
               Jewelry store manager
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-stone-600">
@@ -335,7 +335,7 @@ export default function AdminPage() {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <button
               type="button"
               onClick={resetCatalog}
@@ -352,16 +352,16 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Metric label="Products" value={products.length} />
           <Metric label="Categories" value={categories.length} />
           <Metric label="Catalog value" value={formatPrice(totalValue)} />
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-2">
-          <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between gap-4">
-              <h2 className="text-2xl font-semibold text-[#1f2a24]">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <section className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <h2 className="text-xl font-semibold text-[#1f2a24] sm:text-2xl">
                 Category management
               </h2>
               <button
@@ -468,7 +468,7 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 sm:shrink-0">
                     <button
                       type="button"
                       onClick={() => startEditCategory(category)}
@@ -500,9 +500,9 @@ export default function AdminPage() {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between gap-4">
-              <h2 className="flex items-center gap-2 text-2xl font-semibold text-[#1f2a24]">
+          <section className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <h2 className="flex items-center gap-2 text-xl font-semibold text-[#1f2a24] sm:text-2xl">
                 <Gem size={22} /> Product management
               </h2>
               <button
@@ -754,23 +754,23 @@ export default function AdminPage() {
               products.map((product) => (
                 <div
                   key={product.id}
-                  className="grid gap-4 rounded-xl border border-stone-200 p-4 md:grid-cols-[130px_1fr_auto]"
+                  className="grid gap-4 rounded-xl border border-stone-200 p-4 md:grid-cols-[130px_minmax(0,1fr)_auto]"
                 >
                   {product.image.src ? (
                     <img
                       src={product.image.src}
                       alt={product.image.alt}
-                      className="h-32 w-full rounded-lg object-cover"
+                      className="h-40 w-full rounded-lg object-cover md:h-32"
                     />
                   ) : (
-                    <div className="flex h-32 items-center justify-center rounded-lg bg-[#f7f1e8] text-xs text-stone-500">
+                    <div className="flex h-40 items-center justify-center rounded-lg bg-[#f7f1e8] text-xs text-stone-500 md:h-32">
                       No image
                     </div>
                   )}
 
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-lg font-semibold text-[#1f2a24]">
+                      <p className="text-base font-semibold text-[#1f2a24] sm:text-lg">
                         {product.name}
                       </p>
                       {product.badge ? (
@@ -834,9 +834,9 @@ function Metric({
   value: string | number;
 }) {
   return (
-    <div className="rounded-lg border border-stone-200 bg-white p-6 shadow-sm">
+    <div className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
       <p className="text-sm font-medium text-stone-600">{label}</p>
-      <p className="mt-2 text-4xl font-semibold text-[#1f2a24]">{value}</p>
+      <p className="mt-2 text-3xl font-semibold text-[#1f2a24] sm:text-4xl">{value}</p>
     </div>
   );
 }

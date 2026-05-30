@@ -24,12 +24,12 @@ export default function Hero() {
 
   return (
     <section className="relative overflow-hidden bg-[#f7f1e8]">
-      <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-7xl items-center gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:px-8 lg:py-14">
+      <div className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-7xl items-center gap-8 px-4 py-10 sm:min-h-[calc(100vh-5rem)] sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:px-8 lg:py-14">
         <div className="relative z-10 max-w-xl">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8b1e3f]">
             The Signature Collection
           </p>
-          <h1 className="mt-5 max-w-3xl text-5xl font-semibold leading-[0.95] text-[#1f2a24] sm:text-6xl lg:text-7xl">
+          <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-[0.95] text-[#1f2a24] sm:text-5xl lg:text-7xl">
             Fine jewelry for the modern heirloom.
           </h1>
           <p className="mt-6 max-w-lg text-base leading-8 text-stone-700 sm:text-lg">
@@ -67,7 +67,7 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="relative min-h-[380px] overflow-hidden rounded-lg border border-white/70 bg-white shadow-2xl shadow-stone-900/10 sm:min-h-[500px] lg:min-h-[660px]">
+        <div className="relative min-h-[320px] overflow-hidden rounded-lg border border-white/70 bg-white shadow-2xl shadow-stone-900/10 sm:min-h-[500px] lg:min-h-[660px]">
           <Image
             src="/jewelry-hero.png"
             alt="Pearl necklace, gold hoop earrings, diamond ring, and tennis bracelet on stone and silk"
@@ -79,7 +79,7 @@ export default function Hero() {
           {heroProduct ? (
             <Link
               href={getProductHref(heroProduct)}
-              className="absolute bottom-4 left-4 right-4 grid gap-3 rounded-lg bg-[#1f2a24]/92 p-4 text-white backdrop-blur transition hover:bg-[#2d3b33]/95 sm:left-6 sm:right-auto sm:w-80"
+              className="absolute bottom-4 left-4 right-4 grid gap-3 rounded-lg bg-[#1f2a24]/92 p-4 text-white backdrop-blur transition hover:bg-[#2d3b33]/95 sm:left-6 sm:right-auto sm:w-80 sm:p-5"
             >
               <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d7b56d]">
                 Limited release

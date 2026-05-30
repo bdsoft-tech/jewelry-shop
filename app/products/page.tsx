@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, Suspense } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import ProductCard from "@/app/components/ProductCard";
 import { useCatalog } from "@/app/components/Catalog/CatalogProvider";
@@ -18,7 +18,8 @@ const sortLabels = {
   "price-desc": "Price: high to low",
 } as const;
 
-export default function ProductsPage() {
+// 1. Move your primary page logic into a distinct sub-component
+function ProductsContent() {
   const { categories, products } = useCatalog();
   const router = useRouter();
   const pathname = usePathname();
@@ -72,7 +73,7 @@ export default function ProductsPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8b1e3f]">
               Collection
             </p>
-            <h1 className="mt-4 text-5xl font-semibold text-[#1f2a24]">
+            <h1 className="mt-4 text-3xl font-semibold text-[#1f2a24] sm:text-4xl lg:text-5xl">
               Shop fine jewelry
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-8 text-stone-700">
@@ -96,7 +97,7 @@ export default function ProductsPage() {
                 onChange={(event) =>
                   updateQuery({ q: event.target.value || null })
                 }
-                className="h-12 w-full rounded-md border border-stone-300 bg-white pl-11 pr-12 text-sm text-[#1f2a24] outline-none transition placeholder:text-stone-400 focus:border-[#8b1e3f] focus:ring-2 focus:ring-[#d7b56d]/40"
+                className="h-12 w-full rounded-md border border-stone-300 bg-white pl-11 pr-12 text-sm text-[#1f2a24] outline-none transition placeholder:text-stone-400 focus:border-[#8b1e3f] focus:ring-2 focus:ring-[#d7b56d]/40 sm:text-base"
               />
               {searchQuery ? (
                 <button
@@ -110,7 +111,7 @@ export default function ProductsPage() {
               ) : null}
             </label>
 
-            <label className="flex items-center justify-between gap-4 rounded-md border border-stone-300 bg-white px-4 py-3 text-sm font-medium text-[#1f2a24]">
+            <label className="flex flex-col gap-3 rounded-md border border-stone-300 bg-white px-4 py-3 text-sm font-medium text-[#1f2a24] sm:flex-row sm:items-center sm:justify-between">
               <span className="inline-flex items-center gap-2">
                 <SlidersHorizontal size={16} aria-hidden="true" />
                 Price sort
@@ -150,15 +151,17 @@ export default function ProductsPage() {
                   <SlidersHorizontal size={16} aria-hidden="true" />
                   Browse
                 </span>
-                {categories.map((category) => (
-                  <a
-                    key={category.id}
-                    href={getCategoryHref(category)}
-                    className="inline-flex h-11 items-center rounded-md border border-stone-300 px-4 text-sm font-semibold text-stone-700 transition hover:border-[#8b1e3f] hover:text-[#8b1e3f]"
-                  >
-                    {category.name}
-                  </a>
-                ))}
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((category) => (
+                    <a
+                      key={category.id}
+                      href={getCategoryHref(category)}
+                      className="inline-flex h-11 items-center rounded-md border border-stone-300 px-4 text-sm font-semibold text-stone-700 transition hover:border-[#8b1e3f] hover:text-[#8b1e3f]"
+                    >
+                      {category.name}
+                    </a>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -169,7 +172,7 @@ export default function ProductsPage() {
             <div className="mb-6 max-w-3xl">
               <h2
                 id="search-results-heading"
-                className="text-3xl font-semibold text-[#1f2a24]"
+                className="text-2xl font-semibold text-[#1f2a24] sm:text-3xl"
               >
                 Search results
               </h2>
@@ -214,7 +217,7 @@ export default function ProductsPage() {
                   <div className="mb-6 max-w-3xl">
                     <h2
                       id={`${category.slug}-heading`}
-                      className="text-3xl font-semibold text-[#1f2a24]"
+                      className="text-2xl font-semibold text-[#1f2a24] sm:text-3xl"
                     >
                       {category.name}
                     </h2>
@@ -239,5 +242,18 @@ export default function ProductsPage() {
         )}
       </div>
     </main>
+  );
+}
+
+// 2. Keep the export lightweight and safe for Next.js build-time pre-rendering
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex-1 bg-[#fbfaf7] py-20 text-center text-stone-500">
+        Loading catalog...
+      </div>
+    }>
+      <ProductsContent />
+    </Suspense>
   );
 }

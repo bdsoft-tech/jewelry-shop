@@ -28,7 +28,7 @@ export default function ProductDetailsClient({
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8b1e3f]">
             Collection
           </p>
-          <h1 className="mt-4 text-4xl font-semibold text-[#1f2a24]">
+          <h1 className="mt-4 text-3xl font-semibold text-[#1f2a24] sm:text-4xl">
             Product not found
           </h1>
           <p className="mt-4 text-base leading-8 text-stone-700">
@@ -59,7 +59,7 @@ export default function ProductDetailsClient({
           Back to collection
         </Link>
 
-        <section className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(420px,0.95fr)] lg:items-start">
+        <section className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(380px,0.95fr)] lg:items-start">
           <div className="relative aspect-[4/5] overflow-hidden rounded-lg border border-stone-200 bg-stone-100 shadow-sm">
             <Image
               src={product.image.src}
@@ -73,7 +73,7 @@ export default function ProductDetailsClient({
           </div>
 
           <div className="lg:sticky lg:top-28">
-            <div className="rounded-lg border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+            <div className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm sm:p-8">
               <div className="flex flex-wrap items-center gap-3">
                 <Link
                   href={category ? `/products${getCategoryHref(category)}` : "/products"}
@@ -88,15 +88,15 @@ export default function ProductDetailsClient({
                 ) : null}
               </div>
 
-              <h1 className="mt-5 text-4xl font-semibold leading-tight text-[#1f2a24] sm:text-5xl">
+              <h1 className="mt-5 text-3xl font-semibold leading-tight text-[#1f2a24] sm:text-4xl lg:text-5xl">
                 {product.name}
               </h1>
               <p className="mt-4 text-lg leading-8 text-stone-700">
                 {product.description}
               </p>
 
-              <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-y border-stone-200 py-5">
-                <p className="text-3xl font-semibold text-[#1f2a24]">
+              <div className="mt-6 flex flex-col gap-3 border-y border-stone-200 py-5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+                <p className="text-2xl font-semibold text-[#1f2a24] sm:text-3xl">
                   {formatPrice(product.price)}
                 </p>
                 <div className="flex items-center gap-1 text-sm font-semibold text-stone-700">
@@ -149,7 +149,7 @@ export default function ProductDetailsClient({
               </div>
             </div>
 
-            <div className="mt-6 grid gap-6 rounded-lg border border-stone-200 bg-white p-6 shadow-sm sm:grid-cols-2 sm:p-8">
+            <div className="mt-6 grid gap-6 rounded-lg border border-stone-200 bg-white p-5 shadow-sm sm:grid-cols-2 sm:p-8">
               <div>
                 <h2 className="text-lg font-semibold text-[#1f2a24]">
                   Materials
@@ -189,7 +189,7 @@ export default function ProductDetailsClient({
                 </p>
                 <h2
                   id="related-heading"
-                  className="mt-3 text-3xl font-semibold text-[#1f2a24]"
+                  className="mt-3 text-2xl font-semibold text-[#1f2a24] sm:text-3xl"
                 >
                   Explore related pieces
                 </h2>

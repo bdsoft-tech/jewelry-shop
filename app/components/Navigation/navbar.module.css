@@ -1,0 +1,74 @@
+/* navbar.module.css */
+
+/* Smooth transitions for all interactive elements */
+.navLink {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Active link styling */
+.navLinkActive {
+  color: #8b1e3f;
+  font-weight: 600;
+}
+
+/* Mobile menu animations */
+@keyframes slideIn {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+/* Responsive breakpoints */
+@media (max-width: 768px) {
+  .logoText {
+    font-size: 0.75rem;
+  }
+  
+  .actionButton {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+/* Touch-friendly tap targets */
+@media (hover: none) and (pointer: coarse) {
+  .navLink,
+  .actionButton {
+    min-height: 44px; /* Apple's recommended minimum touch target size */
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .navLink:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

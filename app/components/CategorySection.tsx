@@ -22,7 +22,7 @@ export default function CategorySection() {
           </p>
           <h2
             id="categories-heading"
-            className="mt-4 text-4xl font-semibold text-[#1f2a24] sm:text-5xl"
+            className="mt-4 text-3xl font-semibold text-[#1f2a24] sm:text-4xl lg:text-5xl"
           >
             Find your signature piece
           </h2>
@@ -32,7 +32,7 @@ export default function CategorySection() {
           </p>
         </div>
 
-        <div className="mt-12 space-y-20">
+        <div className="mt-12 space-y-16 sm:space-y-20">
           {categories.map((category) => {
             const categoryProducts = getProductsByCategory(
               products,
@@ -44,8 +44,8 @@ export default function CategorySection() {
 
             return (
               <div key={category.id} className="scroll-mt-20" id={category.slug}>
-                <div className="mb-6 flex items-center justify-between border-b border-stone-200 pb-3">
-                  <h3 className="text-2xl font-semibold text-[#1f2a24]">
+                <div className="mb-6 flex flex-col gap-3 border-b border-stone-200 pb-3 sm:flex-row sm:items-center sm:justify-between">
+                  <h3 className="text-xl font-semibold text-[#1f2a24] sm:text-2xl">
                     {category.name}
                   </h3>
                   <Link
@@ -56,7 +56,7 @@ export default function CategorySection() {
                   </Link>
                 </div>
 
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                   {categoryProducts.map((product) => (
                     <Link
                       key={product.id}

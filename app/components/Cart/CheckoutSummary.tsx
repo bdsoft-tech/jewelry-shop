@@ -47,11 +47,11 @@ export default function CheckoutSummary() {
 
   return (
     <section className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-      <div className="rounded-lg border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+      <div className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm sm:p-8">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8b1e3f]">
           Secure checkout
         </p>
-        <h1 className="mt-4 text-4xl font-semibold text-[#1f2a24]">
+        <h1 className="mt-4 text-3xl font-semibold text-[#1f2a24] sm:text-4xl">
           Complete your order
         </h1>
         <p className="mt-4 text-base leading-8 text-stone-700">
@@ -122,7 +122,7 @@ export default function CheckoutSummary() {
         </form>
       </div>
 
-      <aside className="h-fit rounded-lg border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+      <aside className="h-fit rounded-lg border border-stone-200 bg-white p-5 shadow-sm sm:p-8">
         <div className="flex items-center gap-3 text-[#1f2a24]">
           <ShieldCheck size={22} aria-hidden="true" />
           <h2 className="text-xl font-semibold">Protected purchase</h2>
