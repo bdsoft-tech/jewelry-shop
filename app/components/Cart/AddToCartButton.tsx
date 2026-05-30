@@ -4,10 +4,10 @@ import { useEffect, useState, type ReactNode } from "react";
 import clsx from "clsx";
 import { Check, ShoppingBag } from "lucide-react";
 import { useCart } from "@/app/components/Cart/CartProvider";
-import type { ProductId } from "@/app/data/products";
+import type { CatalogProduct } from "@/app/lib/catalog";
 
 type AddToCartButtonProps = {
-  productId: ProductId;
+  productId: CatalogProduct["id"];
   productName: string;
   className?: string;
   children?: ReactNode;

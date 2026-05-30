@@ -1,18 +1,21 @@
+"use client";
+
 import Link from "next/link";
 import { Gem, Search, User } from "lucide-react";
+import { useCatalog } from "@/app/components/Catalog/CatalogProvider";
 import CartLink from "@/app/components/Cart/CartLink";
-import { productCategories } from "@/app/data/products";
-
-const navItems = [
-  { label: "New In", href: "/products" },
-  ...productCategories
-    .filter((category) =>
-      ["rings", "necklaces", "bespoke"].includes(category.id),
-    )
-    .map((category) => ({ label: category.name, href: category.href })),
-];
+import { getCategoryHref } from "@/app/lib/catalog";
 
 export default function Navbar() {
+  const { categories } = useCatalog();
+  const navItems = [
+    { label: "New In", href: "/products" },
+    ...categories.slice(0, 3).map((category) => ({
+      label: category.name,
+      href: `/products${getCategoryHref(category)}`,
+    })),
+  ];
+
   return (
     <header className="sticky top-0 z-50 border-b border-stone-200/80 bg-[#fbfaf7]/95 backdrop-blur-sm">
       <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">

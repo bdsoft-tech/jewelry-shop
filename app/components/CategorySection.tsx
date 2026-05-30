@@ -1,13 +1,18 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import {
   formatPrice,
+  getCategoryHref,
   getProductHref,
   getProductsByCategory,
-  productCategories,
-} from "@/app/data/products";
+} from "@/app/lib/catalog";
+import { useCatalog } from "@/app/components/Catalog/CatalogProvider";
 
 export default function CategorySection() {
+  const { categories, products } = useCatalog();
+
   return (
     <section className="py-20 sm:py-24" aria-labelledby="categories-heading">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -28,20 +33,23 @@ export default function CategorySection() {
         </div>
 
         <div className="mt-12 space-y-20">
-          {productCategories.map((category) => {
-            const categoryProducts = getProductsByCategory(category.id).slice(
+          {categories.map((category) => {
+            const categoryProducts = getProductsByCategory(
+              products,
+              category.id,
+            ).slice(
               0,
               4,
             );
 
             return (
-              <div key={category.id} className="scroll-mt-20" id={category.id}>
+              <div key={category.id} className="scroll-mt-20" id={category.slug}>
                 <div className="mb-6 flex items-center justify-between border-b border-stone-200 pb-3">
                   <h3 className="text-2xl font-semibold text-[#1f2a24]">
                     {category.name}
                   </h3>
                   <Link
-                    href={category.href}
+                    href={`/products${getCategoryHref(category)}`}
                     className="rounded-sm text-sm font-medium text-[#8b1e3f] transition hover:text-[#6b1632] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d7b56d]"
                   >
                     View all -&gt;

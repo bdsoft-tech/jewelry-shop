@@ -1,7 +1,10 @@
+"use client";
+
 import CategorySection from "@/app/components/CategorySection";
 import Hero from "@/app/components/Hero";
 import ProductCard from "@/app/components/ProductCard";
-import { featuredProducts } from "@/app/data/products";
+import { useCatalog } from "@/app/components/Catalog/CatalogProvider";
+import { getNewProducts } from "@/app/lib/catalog";
 import { ArrowRight, BadgeCheck, Gem, Sparkles } from "lucide-react";
 import Link from "next/link";
 
@@ -27,6 +30,9 @@ const atelierNotes = [
 ];
 
 export default function Home() {
+  const { featuredProducts, products } = useCatalog();
+  const newProducts = getNewProducts(products);
+
   return (
     <main className="flex-1 bg-[#fbfaf7]">
       <Hero />
@@ -43,6 +49,50 @@ export default function Home() {
           <p>18k recycled gold</p>
           <p>Conflict-free diamonds</p>
           <p>Insured worldwide shipping</p>
+        </div>
+      </section>
+
+      <section className="py-20 sm:py-24" aria-labelledby="new-products-heading">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8b1e3f]">
+                New arrivals
+              </p>
+              <h2
+                id="new-products-heading"
+                className="mt-4 text-4xl font-semibold text-[#1f2a24] sm:text-5xl"
+              >
+                Fresh pieces, arranged like a private preview.
+              </h2>
+              <p className="mt-4 max-w-2xl text-base leading-8 text-stone-700">
+                Scroll through the latest additions from the shared catalog and
+                jump straight into the pieces marked new.
+              </p>
+            </div>
+            <Link
+              href="/products?q=new"
+              className="inline-flex h-11 w-fit items-center gap-2 rounded-md border border-stone-300 px-4 text-sm font-semibold text-[#1f2a24] transition hover:border-[#8b1e3f] hover:text-[#8b1e3f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d7b56d]"
+            >
+              View all new
+              <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+          </div>
+
+          <div className="-mx-4 mt-10 overflow-x-auto px-4 pb-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+            <div className="flex gap-5 snap-x snap-mandatory">
+              {(newProducts.length > 0 ? newProducts : featuredProducts.slice(0, 4)).map(
+                (product, index) => (
+                  <div
+                    key={product.id}
+                    className="w-[18rem] shrink-0 snap-start sm:w-[20rem] lg:w-[22rem]"
+                  >
+                    <ProductCard product={product} priority={index === 0} />
+                  </div>
+                ),
+              )}
+            </div>
+          </div>
         </div>
       </section>
 

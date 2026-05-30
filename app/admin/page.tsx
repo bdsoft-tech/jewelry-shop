@@ -1,60 +1,869 @@
+"use client";
+
 import Link from "next/link";
-import { ChartNoAxesColumnIncreasing, Gem, PackageCheck } from "lucide-react";
-import { formatPrice, productCategories, products } from "@/app/data/products";
+import { Gem, Pencil, Plus, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { useCatalog } from "@/app/components/Catalog/CatalogProvider";
+import {
+  createCatalogCategoryDraft,
+  formatPrice,
+  slugify,
+  type CatalogCategory,
+  type CatalogProduct,
+} from "@/app/lib/catalog";
 
-const inventoryValue = products.reduce(
-  (total, product) => total + (product.price ?? 0),
-  0,
-);
+type CategoryFormState = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  image: string;
+};
 
-const metrics = [
-  { label: "Open orders", value: "0", icon: PackageCheck },
-  { label: "Active pieces", value: products.length.toString(), icon: Gem },
-  {
-    label: "Catalog value",
-    value: formatPrice(inventoryValue),
-    icon: ChartNoAxesColumnIncreasing,
-  },
-];
+type ProductFormState = {
+  id: string;
+  name: string;
+  slug: string;
+  categoryId: string;
+  price: string;
+  priceOnRequest: boolean;
+  shortDescription: string;
+  description: string;
+  badge: string;
+  rating: string;
+  materials: string;
+  details: string;
+  care: string;
+  featured: boolean;
+  tags: string;
+  image: string;
+  imageAlt: string;
+  imageObjectPosition: string;
+};
+
+function buildCategoryForm(category?: Partial<CatalogCategory>): CategoryFormState {
+  if (!category) {
+    return {
+      id: "",
+      name: "",
+      slug: "",
+      description: "",
+      image: "",
+    };
+  }
+
+  const draft = createCatalogCategoryDraft(category);
+
+  return {
+    id: draft.id,
+    name: draft.name,
+    slug: draft.slug,
+    description: draft.description,
+    image: draft.image,
+  };
+}
+
+function buildProductForm(
+  product?: Partial<CatalogProduct>,
+  categories: CatalogCategory[] = [],
+  categoryId = "",
+): ProductFormState {
+  if (!product) {
+    return {
+      id: "",
+      name: "",
+      slug: "",
+      categoryId: categoryId || categories[0]?.id || "",
+      price: "",
+      priceOnRequest: false,
+      shortDescription: "",
+      description: "",
+      badge: "",
+      rating: "4.8",
+      materials: "",
+      details: "",
+      care: "",
+      featured: false,
+      tags: "",
+      image: "",
+      imageAlt: "",
+      imageObjectPosition: "50% 50%",
+    };
+  }
+
+  const draft = {
+    id: product.id ?? "",
+    name: product.name ?? "",
+    slug: product.slug ?? "",
+    categoryId: (product.categoryId ?? categoryId) || categories[0]?.id || "",
+    price: product.price ?? null,
+    shortDescription: product.shortDescription ?? "",
+    description: product.description ?? "",
+    badge: product.badge ?? "",
+    rating: product.rating ?? 4.8,
+    materials: product.materials ?? [],
+    details: product.details ?? [],
+    care: product.care ?? "",
+    featured: product.featured ?? false,
+    tags: product.tags ?? [],
+    image: product.image ?? {
+      src: "",
+      alt: "",
+      objectPosition: "50% 50%",
+    },
+  };
+
+  return {
+    id: draft.id,
+    name: draft.name,
+    slug: draft.slug,
+    categoryId: draft.categoryId,
+    price: draft.price === null ? "" : String(draft.price),
+    priceOnRequest: draft.price === null,
+    shortDescription: draft.shortDescription,
+    description: draft.description,
+    badge: draft.badge ?? "",
+    rating: String(draft.rating ?? 4.8),
+    materials: draft.materials.join(", "),
+    details: draft.details.join(", "),
+    care: draft.care,
+    featured: draft.featured,
+    tags: draft.tags.join(", "),
+    image: draft.image.src,
+    imageAlt: draft.image.alt,
+    imageObjectPosition: draft.image.objectPosition,
+  };
+}
+
+function parseList(value: string) {
+  return value
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
+function fileToDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result ?? ""));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
+function CatalogImageField({
+  label,
+  image,
+  previewUrl,
+  onFileChange,
+}: {
+  label: string;
+  image: string;
+  previewUrl: string;
+  onFileChange: (file: File | null) => void;
+}) {
+  return (
+    <label className="text-sm font-medium text-stone-700">
+      {label}
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(event) => onFileChange(event.target.files?.[0] ?? null)}
+        className="mt-2 w-full rounded-md border border-stone-200 px-3 py-2"
+      />
+      {previewUrl ? (
+        <img
+          src={previewUrl}
+          alt={label}
+          className="mt-3 h-36 w-full rounded-lg object-cover"
+        />
+      ) : image ? (
+        <img
+          src={image}
+          alt={label}
+          className="mt-3 h-36 w-full rounded-lg object-cover"
+        />
+      ) : (
+        <div className="mt-3 flex h-36 items-center justify-center rounded-lg border border-dashed border-stone-300 text-xs text-stone-500">
+          No image selected
+        </div>
+      )}
+    </label>
+  );
+}
 
 export default function AdminPage() {
+  const {
+    categories,
+    deleteCategory,
+    deleteProduct,
+    products,
+    resetCatalog,
+    upsertCategory,
+    upsertProduct,
+  } = useCatalog();
+
+  const [categoryForm, setCategoryForm] = useState<CategoryFormState>(() =>
+    buildCategoryForm(),
+  );
+  const [productForm, setProductForm] = useState<ProductFormState>(() =>
+    buildProductForm(undefined, categories, categories[0]?.id ?? ""),
+  );
+  const [categoryFile, setCategoryFile] = useState<File | null>(null);
+  const [categoryPreviewUrl, setCategoryPreviewUrl] = useState("");
+  const [productFile, setProductFile] = useState<File | null>(null);
+  const [productPreviewUrl, setProductPreviewUrl] = useState("");
+
+  useEffect(() => {
+    if (
+      categories.length > 0 &&
+      !categories.some((category) => category.id === productForm.categoryId)
+    ) {
+      setProductForm((current) => ({
+        ...current,
+        categoryId: categories[0].id,
+      }));
+    }
+  }, [categories, productForm.categoryId]);
+
+  useEffect(() => {
+    return () => {
+      if (categoryPreviewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(categoryPreviewUrl);
+      }
+    };
+  }, [categoryPreviewUrl]);
+
+  useEffect(() => {
+    return () => {
+      if (productPreviewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(productPreviewUrl);
+      }
+    };
+  }, [productPreviewUrl]);
+
+  const totalValue = useMemo(
+    () => products.reduce((total, product) => total + (product.price ?? 0), 0),
+    [products],
+  );
+
+  async function handleSaveCategory() {
+    if (!categoryForm.name.trim()) {
+      return;
+    }
+
+    const image =
+      categoryFile !== null ? await fileToDataUrl(categoryFile) : categoryForm.image;
+
+    upsertCategory({
+      id: categoryForm.id,
+      name: categoryForm.name,
+      slug: categoryForm.slug || slugify(categoryForm.name),
+      description: categoryForm.description,
+      image,
+    });
+
+    setCategoryForm(buildCategoryForm());
+    setCategoryFile(null);
+    setCategoryPreviewUrl("");
+  }
+
+  async function handleSaveProduct() {
+    if (!productForm.name.trim()) {
+      return;
+    }
+
+    const image =
+      productFile !== null ? await fileToDataUrl(productFile) : productForm.image;
+
+    upsertProduct({
+      id: productForm.id,
+      name: productForm.name,
+      slug: productForm.slug || slugify(productForm.name),
+      categoryId: productForm.categoryId,
+      price: productForm.priceOnRequest
+        ? null
+        : Number(productForm.price || 0),
+      shortDescription: productForm.shortDescription,
+      description: productForm.description,
+      badge: productForm.badge.trim() || undefined,
+      rating: Number(productForm.rating || 0),
+      materials: parseList(productForm.materials),
+      details: parseList(productForm.details),
+      care: productForm.care,
+      featured: productForm.featured,
+      tags: parseList(productForm.tags),
+      image: {
+        src: image,
+        alt: productForm.imageAlt || productForm.name,
+        objectPosition: productForm.imageObjectPosition || "50% 50%",
+      },
+    });
+
+    setProductForm(buildProductForm(undefined, categories, categories[0]?.id ?? ""));
+    setProductFile(null);
+    setProductPreviewUrl("");
+  }
+
+  function startEditCategory(category: CatalogCategory) {
+    setCategoryForm(buildCategoryForm(category));
+    setCategoryFile(null);
+    setCategoryPreviewUrl("");
+  }
+
+  function startEditProduct(product: CatalogProduct) {
+    setProductForm(buildProductForm(product, categories, product.categoryId));
+    setProductFile(null);
+    setProductPreviewUrl("");
+  }
+
   return (
-    <main className="flex-1 bg-[#fbfaf7] px-4 py-14 sm:px-6 lg:px-8">
-      <section className="mx-auto max-w-6xl">
+    <main className="min-h-screen bg-[#fbfaf7] px-4 py-12 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-7xl space-y-10">
         <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8b1e3f]">
-              Admin
+              Admin demo
             </p>
-            <h1 className="mt-4 text-4xl font-semibold text-[#1f2a24]">Store overview</h1>
-            <p className="mt-3 text-sm text-stone-600">
-              {productCategories.length} curated storefront categories are
-              ready for client browsing.
+            <h1 className="mt-4 text-4xl font-semibold text-[#1f2a24]">
+              Jewelry store manager
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-stone-600">
+              Add, edit, and delete categories or products from the browser.
+              Changes update the storefront immediately and stay in this session
+              until the tab closes.
             </p>
           </div>
-          <Link
-            href="/products"
-            className="inline-flex h-11 w-fit items-center rounded-md bg-[#1f2a24] px-4 text-sm font-semibold text-white transition hover:bg-[#2d3b33]"
-          >
-            View storefront
-          </Link>
+
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={resetCatalog}
+              className="rounded-md border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700 transition hover:border-[#8b1e3f] hover:text-[#8b1e3f]"
+            >
+              Reset demo data
+            </button>
+            <Link
+              href="/products"
+              className="rounded-md bg-[#1f2a24] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#2d3b33]"
+            >
+              View storefront
+            </Link>
+          </div>
         </div>
 
-        <div className="mt-8 grid gap-5 md:grid-cols-3">
-          {metrics.map((metric) => {
-            const Icon = metric.icon;
-            return (
-              <div key={metric.label} className="rounded-lg border border-stone-200 bg-white p-6 shadow-sm">
-                <span className="flex h-11 w-11 items-center justify-center rounded-md bg-[#f7f1e8] text-[#8b6d2f]">
-                  <Icon size={21} aria-hidden="true" />
-                </span>
-                <p className="mt-5 text-sm font-medium text-stone-600">{metric.label}</p>
-                <p className="mt-2 text-4xl font-semibold text-[#1f2a24]">{metric.value}</p>
-              </div>
-            );
-          })}
+        <div className="grid gap-5 md:grid-cols-3">
+          <Metric label="Products" value={products.length} />
+          <Metric label="Categories" value={categories.length} />
+          <Metric label="Catalog value" value={formatPrice(totalValue)} />
         </div>
+
+        <div className="grid gap-8 lg:grid-cols-2">
+          <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="text-2xl font-semibold text-[#1f2a24]">
+                Category management
+              </h2>
+              <button
+                type="button"
+                onClick={() => {
+                  setCategoryForm(buildCategoryForm());
+                  setCategoryFile(null);
+                  setCategoryPreviewUrl("");
+                }}
+                className="rounded-md border border-stone-300 px-3 py-2 text-sm font-semibold text-stone-700"
+              >
+                New category
+              </button>
+            </div>
+
+            <div className="mt-6 grid gap-4">
+              <Input
+                label="Category name"
+                value={categoryForm.name}
+                onChange={(value) =>
+                  setCategoryForm((current) => ({
+                    ...current,
+                    name: value,
+                    slug: current.id ? current.slug : slugify(value),
+                  }))
+                }
+              />
+
+              <Input
+                label="Slug"
+                value={categoryForm.slug}
+                onChange={(value) =>
+                  setCategoryForm((current) => ({
+                    ...current,
+                    slug: slugify(value),
+                  }))
+                }
+              />
+
+              <label className="text-sm font-medium text-stone-700">
+                Description
+                <textarea
+                  value={categoryForm.description}
+                  onChange={(event) =>
+                    setCategoryForm((current) => ({
+                      ...current,
+                      description: event.target.value,
+                    }))
+                  }
+                  className="mt-2 min-h-24 w-full rounded-md border border-stone-200 px-3 py-2 outline-none focus:border-[#8b1e3f]"
+                />
+              </label>
+
+              <CatalogImageField
+                label="Category image"
+                image={categoryForm.image}
+                previewUrl={categoryPreviewUrl}
+                onFileChange={(file) => {
+                  if (categoryPreviewUrl.startsWith("blob:")) {
+                    URL.revokeObjectURL(categoryPreviewUrl);
+                  }
+
+                  setCategoryFile(file);
+                  setCategoryPreviewUrl(file ? URL.createObjectURL(file) : "");
+                }}
+              />
+
+              <button
+                type="button"
+                onClick={handleSaveCategory}
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-[#1f2a24] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#2d3b33]"
+              >
+                <Plus size={18} />
+                {categoryForm.id ? "Update category" : "Add category"}
+              </button>
+            </div>
+
+            <div className="mt-8 space-y-3">
+              {categories.map((category) => (
+                <div
+                  key={category.id}
+                  className="flex flex-col gap-4 rounded-lg border border-stone-200 p-4 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="flex items-center gap-3">
+                    {category.image ? (
+                      <img
+                        src={category.image}
+                        alt={category.name}
+                        className="h-14 w-14 rounded-lg object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-[#f7f1e8] text-xs text-stone-500">
+                        No image
+                      </div>
+                    )}
+
+                    <div>
+                      <p className="font-semibold text-[#1f2a24]">
+                        {category.name}
+                      </p>
+                      <p className="text-xs text-stone-500">
+                        /products#{category.slug}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => startEditCategory(category)}
+                      className="rounded-md border border-stone-300 p-2 text-stone-700 transition hover:border-[#8b1e3f] hover:text-[#8b1e3f]"
+                      aria-label={`Edit ${category.name}`}
+                    >
+                      <Pencil size={17} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        deleteCategory(category.id);
+
+                        if (categoryForm.id === category.id) {
+                          setCategoryForm(buildCategoryForm());
+                          setCategoryFile(null);
+                          setCategoryPreviewUrl("");
+                        }
+                      }}
+                      disabled={categories.length <= 1}
+                      className="rounded-md border border-red-200 p-2 text-red-600 transition hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                      aria-label={`Delete ${category.name}`}
+                    >
+                      <Trash2 size={17} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="flex items-center gap-2 text-2xl font-semibold text-[#1f2a24]">
+                <Gem size={22} /> Product management
+              </h2>
+              <button
+                type="button"
+                onClick={() => {
+                  setProductForm(
+                    buildProductForm(undefined, categories, categories[0]?.id ?? ""),
+                  );
+                  setProductFile(null);
+                  setProductPreviewUrl("");
+                }}
+                className="rounded-md border border-stone-300 px-3 py-2 text-sm font-semibold text-stone-700"
+              >
+                New product
+              </button>
+            </div>
+
+            <div className="mt-6 grid gap-4">
+              <Input
+                label="Product name"
+                value={productForm.name}
+                onChange={(value) =>
+                  setProductForm((current) => ({
+                    ...current,
+                    name: value,
+                    slug: current.id ? current.slug : slugify(value),
+                    imageAlt: current.imageAlt || value,
+                  }))
+                }
+              />
+
+              <Input
+                label="Slug"
+                value={productForm.slug}
+                onChange={(value) =>
+                  setProductForm((current) => ({
+                    ...current,
+                    slug: slugify(value),
+                  }))
+                }
+              />
+
+              <label className="text-sm font-medium text-stone-700">
+                Category
+                <select
+                  value={productForm.categoryId}
+                  onChange={(event) =>
+                    setProductForm((current) => ({
+                      ...current,
+                      categoryId: event.target.value,
+                    }))
+                  }
+                  className="mt-2 w-full rounded-md border border-stone-200 px-3 py-2"
+                >
+                  <option value="">Select category</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Input
+                  label="Price"
+                  type="number"
+                  value={productForm.price}
+                  onChange={(value) =>
+                    setProductForm((current) => ({ ...current, price: value }))
+                  }
+                  disabled={productForm.priceOnRequest}
+                />
+                <label className="flex items-center gap-2 self-end text-sm text-stone-700">
+                  <input
+                    type="checkbox"
+                    checked={productForm.priceOnRequest}
+                    onChange={(event) =>
+                      setProductForm((current) => ({
+                        ...current,
+                        priceOnRequest: event.target.checked,
+                      }))
+                    }
+                  />
+                  Price on request
+                </label>
+                <Input
+                  label="Rating"
+                  type="number"
+                  value={productForm.rating}
+                  onChange={(value) =>
+                    setProductForm((current) => ({ ...current, rating: value }))
+                  }
+                />
+                <Input
+                  label="Badge"
+                  value={productForm.badge}
+                  onChange={(value) =>
+                    setProductForm((current) => ({ ...current, badge: value }))
+                  }
+                />
+              </div>
+
+              <Input
+                label="Short description"
+                value={productForm.shortDescription}
+                onChange={(value) =>
+                  setProductForm((current) => ({
+                    ...current,
+                    shortDescription: value,
+                  }))
+                }
+              />
+
+              <label className="text-sm font-medium text-stone-700">
+                Description
+                <textarea
+                  value={productForm.description}
+                  onChange={(event) =>
+                    setProductForm((current) => ({
+                      ...current,
+                      description: event.target.value,
+                    }))
+                  }
+                  className="mt-2 min-h-24 w-full rounded-md border border-stone-200 px-3 py-2 outline-none focus:border-[#8b1e3f]"
+                />
+              </label>
+
+              <CatalogImageField
+                label="Product image"
+                image={productForm.image}
+                previewUrl={productPreviewUrl}
+                onFileChange={(file) => {
+                  if (productPreviewUrl.startsWith("blob:")) {
+                    URL.revokeObjectURL(productPreviewUrl);
+                  }
+
+                  setProductFile(file);
+                  setProductPreviewUrl(file ? URL.createObjectURL(file) : "");
+                }}
+              />
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Input
+                  label="Image alt text"
+                  value={productForm.imageAlt}
+                  onChange={(value) =>
+                    setProductForm((current) => ({ ...current, imageAlt: value }))
+                  }
+                />
+                <Input
+                  label="Image object position"
+                  value={productForm.imageObjectPosition}
+                  onChange={(value) =>
+                    setProductForm((current) => ({
+                      ...current,
+                      imageObjectPosition: value,
+                    }))
+                  }
+                />
+              </div>
+
+              <label className="text-sm font-medium text-stone-700">
+                Materials
+                <textarea
+                  value={productForm.materials}
+                  onChange={(event) =>
+                    setProductForm((current) => ({
+                      ...current,
+                      materials: event.target.value,
+                    }))
+                  }
+                  className="mt-2 min-h-20 w-full rounded-md border border-stone-200 px-3 py-2 outline-none focus:border-[#8b1e3f]"
+                />
+              </label>
+
+              <label className="text-sm font-medium text-stone-700">
+                Details
+                <textarea
+                  value={productForm.details}
+                  onChange={(event) =>
+                    setProductForm((current) => ({
+                      ...current,
+                      details: event.target.value,
+                    }))
+                  }
+                  className="mt-2 min-h-20 w-full rounded-md border border-stone-200 px-3 py-2 outline-none focus:border-[#8b1e3f]"
+                />
+              </label>
+
+              <Input
+                label="Care"
+                value={productForm.care}
+                onChange={(value) =>
+                  setProductForm((current) => ({ ...current, care: value }))
+                }
+              />
+
+              <Input
+                label="Tags"
+                value={productForm.tags}
+                onChange={(value) =>
+                  setProductForm((current) => ({ ...current, tags: value }))
+                }
+              />
+
+              <label className="flex items-center gap-2 text-sm text-stone-700">
+                <input
+                  type="checkbox"
+                  checked={productForm.featured}
+                  onChange={(event) =>
+                    setProductForm((current) => ({
+                      ...current,
+                      featured: event.target.checked,
+                    }))
+                  }
+                />
+                Featured product
+              </label>
+
+              <button
+                type="button"
+                onClick={handleSaveProduct}
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-[#8b1e3f] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#741832]"
+              >
+                <Plus size={18} />
+                {productForm.id ? "Update product" : "Add product"}
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-2xl font-semibold text-[#1f2a24]">
+              Product list
+            </h2>
+            <p className="text-sm text-stone-500">
+              {products.length} item{products.length === 1 ? "" : "s"}
+            </p>
+          </div>
+
+          <div className="mt-6 grid gap-4">
+            {products.length === 0 ? (
+              <div className="rounded-lg border border-dashed border-stone-300 p-8 text-sm text-stone-600">
+                No products yet. Create the first item above.
+              </div>
+            ) : (
+              products.map((product) => (
+                <div
+                  key={product.id}
+                  className="grid gap-4 rounded-xl border border-stone-200 p-4 md:grid-cols-[130px_1fr_auto]"
+                >
+                  {product.image.src ? (
+                    <img
+                      src={product.image.src}
+                      alt={product.image.alt}
+                      className="h-32 w-full rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-32 items-center justify-center rounded-lg bg-[#f7f1e8] text-xs text-stone-500">
+                      No image
+                    </div>
+                  )}
+
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-lg font-semibold text-[#1f2a24]">
+                        {product.name}
+                      </p>
+                      {product.badge ? (
+                        <span className="rounded-full bg-[#f7f1e8] px-2 py-1 text-xs font-semibold text-[#8b6d2f]">
+                          {product.badge}
+                        </span>
+                      ) : null}
+                    </div>
+                    <p className="text-sm text-stone-500">
+                      {product.slug} · {categories.find((category) => category.id === product.categoryId)?.name ?? "No category"}
+                    </p>
+                    <p className="mt-2 text-sm text-stone-600">
+                      {product.shortDescription}
+                    </p>
+                    <p className="mt-2 text-sm font-semibold text-[#8b1e3f]">
+                      {formatPrice(product.price)}
+                    </p>
+                  </div>
+
+                  <div className="flex gap-3 md:flex-col">
+                    <button
+                      type="button"
+                      onClick={() => startEditProduct(product)}
+                      className="rounded-md border border-stone-300 px-3 py-2 text-sm font-semibold text-stone-700 transition hover:border-[#8b1e3f] hover:text-[#8b1e3f]"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        deleteProduct(product.id);
+
+                        if (productForm.id === product.id) {
+                          setProductForm(
+                            buildProductForm(undefined, categories, categories[0]?.id ?? ""),
+                          );
+                          setProductFile(null);
+                          setProductPreviewUrl("");
+                        }
+                      }}
+                      className="rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 transition hover:border-red-300 hover:bg-red-50"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
       </section>
     </main>
+  );
+}
+
+function Metric({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number;
+}) {
+  return (
+    <div className="rounded-lg border border-stone-200 bg-white p-6 shadow-sm">
+      <p className="text-sm font-medium text-stone-600">{label}</p>
+      <p className="mt-2 text-4xl font-semibold text-[#1f2a24]">{value}</p>
+    </div>
+  );
+}
+
+function Input({
+  label,
+  value,
+  onChange,
+  type = "text",
+  disabled = false,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  type?: string;
+  disabled?: boolean;
+}) {
+  return (
+    <label className="text-sm font-medium text-stone-700">
+      {label}
+      <input
+        type={type}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        disabled={disabled}
+        className="mt-2 w-full rounded-md border border-stone-200 px-3 py-2 outline-none focus:border-[#8b1e3f] disabled:bg-stone-100"
+      />
+    </label>
   );
 }

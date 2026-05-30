@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { CatalogProvider } from "@/app/components/Catalog/CatalogProvider";
 import { CartProvider } from "@/app/components/Cart/CartProvider";
 import Footer from "@/app/components/Navigation/Footer";
 import Navbar from "@/app/components/Navigation/Navbar";
@@ -32,14 +33,16 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="h-full">
-        <CartProvider>
-          <div className="flex min-h-screen flex-col">
-            <Navbar />
-            {children}
-            <Footer />
-            <FloatingChat />
-          </div>
-        </CartProvider>
+        <CatalogProvider>
+          <CartProvider>
+            <div className="flex min-h-screen flex-col">
+              <Navbar />
+              {children}
+              <Footer />
+              <FloatingChat />
+            </div>
+          </CartProvider>
+        </CatalogProvider>
       </body>
     </html>
   );

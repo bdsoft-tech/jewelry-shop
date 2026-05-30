@@ -1,38 +1,43 @@
+"use client";
+
 import Link from "next/link";
 import { AtSign, Gem, Mail, MapPin } from "lucide-react";
-import { productCategories } from "@/app/data/products";
-
-const footerSections = [
-  {
-    title: "Shop",
-    links: [
-      { label: "New arrivals", href: "/products" },
-      ...productCategories
-        .filter((category) => category.id !== "bespoke")
-        .map((category) => ({ label: category.name, href: category.href })),
-    ],
-  },
-  {
-    title: "Client Care",
-    links: [
-      { label: "Shipping", href: "/products" },
-      { label: "Returns", href: "/products" },
-      { label: "Jewelry care", href: "/products" },
-      { label: "Sizing guide", href: "/products" },
-    ],
-  },
-  {
-    title: "Maison",
-    links: [
-      { label: "Our atelier", href: "/" },
-      { label: "Materials", href: "/" },
-      { label: "Bespoke", href: "/products#bespoke" },
-      { label: "Journal", href: "/" },
-    ],
-  },
-];
+import { useCatalog } from "@/app/components/Catalog/CatalogProvider";
+import { getCategoryHref } from "@/app/lib/catalog";
 
 export default function Footer() {
+  const { categories } = useCatalog();
+  const footerSections = [
+    {
+      title: "Shop",
+      links: [
+        { label: "New arrivals", href: "/products" },
+        ...categories.slice(0, 4).map((category) => ({
+          label: category.name,
+          href: `/products${getCategoryHref(category)}`,
+        })),
+      ],
+    },
+    {
+      title: "Client Care",
+      links: [
+        { label: "Shipping", href: "/products" },
+        { label: "Returns", href: "/products" },
+        { label: "Jewelry care", href: "/products" },
+        { label: "Sizing guide", href: "/products" },
+      ],
+    },
+    {
+      title: "Maison",
+      links: [
+        { label: "Our atelier", href: "/" },
+        { label: "Materials", href: "/" },
+        { label: "Bespoke", href: "/products" },
+        { label: "Journal", href: "/" },
+      ],
+    },
+  ];
+
   return (
     <footer className="bg-[#1f2a24] text-white">
       <div className="mx-auto grid max-w-7xl gap-12 px-4 py-14 sm:px-6 lg:grid-cols-[1.2fr_1.8fr] lg:px-8">

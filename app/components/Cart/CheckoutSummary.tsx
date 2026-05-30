@@ -4,16 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { CreditCard, LockKeyhole, ShieldCheck } from "lucide-react";
 import { useMemo } from "react";
+import { useCatalog } from "@/app/components/Catalog/CatalogProvider";
 import { useCart } from "@/app/components/Cart/CartProvider";
 import {
   formatPrice,
   getProductHref,
   type CatalogProduct,
-} from "@/app/data/products";
-
-type CheckoutSummaryProps = {
-  products: readonly CatalogProduct[];
-};
+} from "@/app/lib/catalog";
 
 type CheckoutRow = {
   product: CatalogProduct;
@@ -21,8 +18,9 @@ type CheckoutRow = {
   lineTotal: number;
 };
 
-export default function CheckoutSummary({ products }: CheckoutSummaryProps) {
+export default function CheckoutSummary() {
   const { hydrated, items } = useCart();
+  const { products } = useCatalog();
 
   const productMap = useMemo(
     () => new Map(products.map((product) => [product.id, product])),

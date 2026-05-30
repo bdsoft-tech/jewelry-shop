@@ -1,11 +1,13 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ShieldCheck, Sparkles, Truck } from "lucide-react";
+import { useCatalog } from "@/app/components/Catalog/CatalogProvider";
 import {
   formatPrice,
   getProductHref,
-  getRequiredProductBySlug,
-} from "@/app/data/products";
+} from "@/app/lib/catalog";
 
 const assurances = [
   { label: "Certified stones", icon: ShieldCheck },
@@ -14,7 +16,11 @@ const assurances = [
 ];
 
 export default function Hero() {
-  const heroProduct = getRequiredProductBySlug("nocturne-pearl-strand");
+  const { featuredProducts, getProductBySlug, products } = useCatalog();
+  const heroProduct =
+    getProductBySlug("nocturne-pearl-strand") ??
+    featuredProducts[0] ??
+    products[0];
 
   return (
     <section className="relative overflow-hidden bg-[#f7f1e8]">
@@ -70,25 +76,27 @@ export default function Hero() {
             sizes="(min-width: 1024px) 54vw, 100vw"
             className="object-cover"
           />
-          <Link
-            href={getProductHref(heroProduct)}
-            className="absolute bottom-4 left-4 right-4 grid gap-3 rounded-lg bg-[#1f2a24]/92 p-4 text-white backdrop-blur transition hover:bg-[#2d3b33]/95 sm:left-6 sm:right-auto sm:w-80"
-          >
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d7b56d]">
-              Limited release
-            </span>
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <p className="text-lg font-semibold">{heroProduct.name}</p>
-                <p className="mt-1 text-sm text-white/72">
-                  {heroProduct.materials.slice(0, 2).join(", ")}
+          {heroProduct ? (
+            <Link
+              href={getProductHref(heroProduct)}
+              className="absolute bottom-4 left-4 right-4 grid gap-3 rounded-lg bg-[#1f2a24]/92 p-4 text-white backdrop-blur transition hover:bg-[#2d3b33]/95 sm:left-6 sm:right-auto sm:w-80"
+            >
+              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d7b56d]">
+                Limited release
+              </span>
+              <div className="flex items-end justify-between gap-4">
+                <div>
+                  <p className="text-lg font-semibold">{heroProduct.name}</p>
+                  <p className="mt-1 text-sm text-white/72">
+                    {heroProduct.materials.slice(0, 2).join(", ")}
+                  </p>
+                </div>
+                <p className="text-lg font-semibold">
+                  {formatPrice(heroProduct.price)}
                 </p>
               </div>
-              <p className="text-lg font-semibold">
-                {formatPrice(heroProduct.price)}
-              </p>
-            </div>
-          </Link>
+            </Link>
+          ) : null}
         </div>
       </div>
     </section>

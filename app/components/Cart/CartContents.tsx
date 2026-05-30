@@ -4,17 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { useMemo } from "react";
+import { useCatalog } from "@/app/components/Catalog/CatalogProvider";
 import { useCart } from "@/app/components/Cart/CartProvider";
 import {
   formatPrice,
   getCategoryName,
   getProductHref,
   type CatalogProduct,
-} from "@/app/data/products";
-
-type CartContentsProps = {
-  products: readonly CatalogProduct[];
-};
+} from "@/app/lib/catalog";
 
 type CartRow = {
   product: CatalogProduct;
@@ -22,8 +19,9 @@ type CartRow = {
   lineTotal: number;
 };
 
-export default function CartContents({ products }: CartContentsProps) {
+export default function CartContents() {
   const { clearCart, hydrated, items, removeItem, setQuantity } = useCart();
+  const { products, categories } = useCatalog();
 
   const productMap = useMemo(
     () => new Map(products.map((product) => [product.id, product])),
@@ -137,7 +135,7 @@ export default function CartContents({ products }: CartContentsProps) {
               <div className="grid gap-4 md:grid-cols-[1fr_auto]">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8b6d2f]">
-                    {getCategoryName(product.category)}
+                    {getCategoryName(categories, product.categoryId)}
                   </p>
                   <Link
                     href={getProductHref(product)}

@@ -1,13 +1,16 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Heart, Star } from "lucide-react";
+import { useCatalog } from "@/app/components/Catalog/CatalogProvider";
 import AddToCartButton from "@/app/components/Cart/AddToCartButton";
 import {
   formatPrice,
   getCategoryName,
   getProductHref,
   type CatalogProduct,
-} from "@/app/data/products";
+} from "@/app/lib/catalog";
 
 export type ProductCardProps = {
   product: CatalogProduct;
@@ -15,6 +18,7 @@ export type ProductCardProps = {
 };
 
 export default function ProductCard({ product, priority = false }: ProductCardProps) {
+  const { categories } = useCatalog();
   const productHref = getProductHref(product);
 
   return (
@@ -54,7 +58,7 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
       <div className="space-y-4 p-5">
         <div className="flex items-center justify-between gap-4">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8b6d2f]">
-            {getCategoryName(product.category)}
+            {getCategoryName(categories, product.categoryId)}
           </p>
           <div className="flex items-center gap-1 text-sm font-medium text-stone-700">
             <Star size={15} className="fill-[#d7b56d] text-[#d7b56d]" aria-hidden="true" />

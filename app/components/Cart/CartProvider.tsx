@@ -2,16 +2,17 @@
 
 import {
   createContext,
+  useEffect,
   useCallback,
   useContext,
   useMemo,
   useSyncExternalStore,
   type ReactNode,
 } from "react";
-import { isProductId, type ProductId } from "@/app/data/products";
+import { useCatalog } from "@/app/components/Catalog/CatalogProvider";
 
 type CartItem = {
-  productId: ProductId;
+  productId: string;
   quantity: number;
 };
 
@@ -19,9 +20,9 @@ type CartContextValue = {
   items: CartItem[];
   totalQuantity: number;
   hydrated: boolean;
-  addItem: (productId: ProductId, quantity?: number) => void;
-  removeItem: (productId: ProductId) => void;
-  setQuantity: (productId: ProductId, quantity: number) => void;
+  addItem: (productId: string, quantity?: number) => void;
+  removeItem: (productId: string) => void;
+  setQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
 };
 
@@ -44,8 +45,7 @@ function normalizeCartItems(value: unknown): CartItem[] {
       !("productId" in item) ||
       !("quantity" in item) ||
       typeof item.productId !== "string" ||
-      typeof item.quantity !== "number" ||
-      !isProductId(item.productId)
+      typeof item.quantity !== "number"
     ) {
       return items;
     }
@@ -71,7 +71,7 @@ function readStoredCart() {
   }
 
   try {
-    const storedCart = window.localStorage.getItem(CART_STORAGE_KEY);
+    const storedCart = window.sessionStorage.getItem(CART_STORAGE_KEY);
     return storedCart
       ? normalizeCartItems(JSON.parse(storedCart))
       : emptyCartSnapshot;
@@ -89,7 +89,7 @@ function writeCartSnapshot(nextItems: CartItem[]) {
 
   if (typeof window !== "undefined") {
     try {
-      window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(nextItems));
+      window.sessionStorage.setItem(CART_STORAGE_KEY, JSON.stringify(nextItems));
     } catch {
       // The in-memory cart still works if browser storage is unavailable.
     }
@@ -141,6 +141,7 @@ function getServerCartSnapshot() {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { products } = useCatalog();
   const items = useSyncExternalStore(
     subscribeToCart,
     getCartSnapshot,
@@ -148,7 +149,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
   const hydrated = cartHydrated;
 
-  const addItem = useCallback((productId: ProductId, quantity = 1) => {
+  useEffect(() => {
+    const validProductIds = new Set(products.map((product) => product.id));
+    const nextItems = items.filter((item) => validProductIds.has(item.productId));
+
+    if (nextItems.length !== items.length) {
+      writeCartSnapshot(nextItems);
+    }
+  }, [items, products]);
+
+  const addItem = useCallback((productId: string, quantity = 1) => {
     updateCartSnapshot((currentItems) => {
       const nextQuantity = Math.max(1, Math.min(99, Math.floor(quantity)));
       const existingItem = currentItems.find(
@@ -167,13 +177,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const removeItem = useCallback((productId: ProductId) => {
+  const removeItem = useCallback((productId: string) => {
     updateCartSnapshot((currentItems) =>
       currentItems.filter((item) => item.productId !== productId),
     );
   }, []);
 
-  const setQuantity = useCallback((productId: ProductId, quantity: number) => {
+  const setQuantity = useCallback((productId: string, quantity: number) => {
     updateCartSnapshot((currentItems) => {
       if (quantity <= 0) {
         return currentItems.filter((item) => item.productId !== productId);
