@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Gem, Pencil, Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useCatalog } from "@/app/components/Catalog/CatalogProvider";
+import { hasDemoSession } from "@/app/lib/demo-auth";
 import {
   createCatalogCategoryDraft,
   formatPrice,
@@ -193,6 +195,7 @@ function CatalogImageField({
 }
 
 export default function AdminPage() {
+  const router = useRouter();
   const {
     categories,
     deleteCategory,
@@ -202,6 +205,9 @@ export default function AdminPage() {
     upsertCategory,
     upsertProduct,
   } = useCatalog();
+  const [accessState, setAccessState] = useState<"checking" | "authorized">(
+    "checking",
+  );
 
   const [categoryForm, setCategoryForm] = useState<CategoryFormState>(() =>
     buildCategoryForm(),
@@ -215,14 +221,30 @@ export default function AdminPage() {
   const [productPreviewUrl, setProductPreviewUrl] = useState("");
 
   useEffect(() => {
+    if (hasDemoSession("admin")) {
+      const timerId = window.setTimeout(() => {
+        setAccessState("authorized");
+      }, 0);
+
+      return () => window.clearTimeout(timerId);
+    }
+
+    router.replace("/admin/login");
+  }, [router]);
+
+  useEffect(() => {
     if (
       categories.length > 0 &&
       !categories.some((category) => category.id === productForm.categoryId)
     ) {
-      setProductForm((current) => ({
-        ...current,
-        categoryId: categories[0].id,
-      }));
+      const timerId = window.setTimeout(() => {
+        setProductForm((current) => ({
+          ...current,
+          categoryId: categories[0].id,
+        }));
+      }, 0);
+
+      return () => window.clearTimeout(timerId);
     }
   }, [categories, productForm.categoryId]);
 
@@ -246,6 +268,33 @@ export default function AdminPage() {
     () => products.reduce((total, product) => total + (product.price ?? 0), 0),
     [products],
   );
+
+  if (accessState !== "authorized") {
+    return (
+      <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-[radial-gradient(circle_at_top_left,_rgba(215,181,109,0.16),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(139,30,63,0.12),_transparent_30%),linear-gradient(160deg,_#fbfaf7_0%,_#f3ece0_55%,_#fbfaf7_100%)] px-4 py-10 sm:px-6 lg:px-8">
+        <section className="w-full max-w-xl rounded-[32px] border border-white/70 bg-white/80 p-6 text-center shadow-[0_24px_80px_rgba(63,47,20,0.16)] backdrop-blur-xl sm:p-10">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1f2a24] text-[#d7b56d]">
+            <Gem size={24} aria-hidden="true" />
+          </div>
+          <p className="mt-6 text-xs font-semibold uppercase tracking-[0.24em] text-[#8b1e3f]">
+            Admin access required
+          </p>
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-[#1f2a24] sm:text-4xl">
+            Redirecting to the admin sign in screen.
+          </h1>
+          <p className="mt-4 text-base leading-8 text-stone-600">
+            This area is protected by a demo session stored in session storage.
+          </p>
+          <Link
+            href="/admin/login"
+            className="mt-8 inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,_#1f2a24,_#3a4b42)] px-5 text-sm font-semibold text-white shadow-[0_16px_30px_rgba(31,42,36,0.24)] transition hover:translate-y-[-1px] hover:shadow-[0_18px_36px_rgba(31,42,36,0.28)]"
+          >
+            Go to admin sign in
+          </Link>
+        </section>
+      </main>
+    );
+  }
 
   async function handleSaveCategory() {
     if (!categoryForm.name.trim()) {

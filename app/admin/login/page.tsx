@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { type FormEvent, type ReactNode, useState } from "react";
-import { ArrowRight, Gem, LockKeyhole, Mail, Sparkles, UserRound } from "lucide-react";
-import { getSafeRedirectPath, setDemoSession } from "@/app/lib/demo-auth";
+import { ArrowRight, Crown, Gem, LockKeyhole, Sparkles, UserRound } from "lucide-react";
+import { setDemoSession } from "@/app/lib/demo-auth";
 
 type LoginValues = {
   email: string;
@@ -88,13 +88,11 @@ function Field({
   );
 }
 
-export default function LoginPage() {
+export default function AdminLoginPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [values, setValues] = useState<LoginValues>(initialValues);
   const [errors, setErrors] = useState<LoginErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const redirectTarget = getSafeRedirectPath(searchParams.get("redirect"), "/");
 
   function updateField<K extends keyof LoginValues>(field: K, value: LoginValues[K]) {
     setValues((current) => ({ ...current, [field]: value }));
@@ -112,10 +110,10 @@ export default function LoginPage() {
     }
 
     setIsSubmitting(true);
-    setDemoSession("user", values.email.trim());
+    setDemoSession("admin", values.email.trim());
     setValues(initialValues);
     setErrors({});
-    router.replace(redirectTarget);
+    router.replace("/admin");
   }
 
   return (
@@ -129,59 +127,53 @@ export default function LoginPage() {
         <section className="max-w-2xl">
           <div className="inline-flex items-center gap-2 rounded-full border border-[#d7b56d]/40 bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#8b1e3f] shadow-sm backdrop-blur">
             <Sparkles size={14} aria-hidden="true" />
-            Client sign in
+            Admin sign in
           </div>
 
           <h1 className="mt-6 text-4xl font-semibold tracking-tight text-[#1f2a24] sm:text-5xl lg:text-6xl">
-            A polished entrance for the private jewelry experience.
+            Enter the private admin lane for the atelier.
           </h1>
 
           <p className="mt-5 max-w-xl text-base leading-8 text-stone-600 sm:text-lg">
-            Use this demo sign in to preview the client-facing flow. No backend,
-            no API, and no account data leaves the browser.
+            This demo sign in stays in the browser with session storage only.
+            No backend, API, or persistent account data is involved.
           </p>
-
-          {redirectTarget !== "/" ? (
-            <p className="mt-4 max-w-xl text-sm leading-7 text-stone-500">
-              After sign in, you will return to {redirectTarget}.
-            </p>
-          ) : null}
 
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
             <div className="rounded-2xl border border-white/70 bg-white/70 p-4 shadow-sm backdrop-blur">
-              <UserRound className="text-[#8b1e3f]" size={18} aria-hidden="true" />
-              <p className="mt-3 text-sm font-semibold text-[#1f2a24]">Client access</p>
+              <Crown className="text-[#8b1e3f]" size={18} aria-hidden="true" />
+              <p className="mt-3 text-sm font-semibold text-[#1f2a24]">Admin access</p>
               <p className="mt-2 text-sm leading-6 text-stone-600">
-                Designed for a luxury storefront experience.
+                Protected from the storefront until you sign in.
               </p>
             </div>
             <div className="rounded-2xl border border-white/70 bg-white/70 p-4 shadow-sm backdrop-blur">
               <LockKeyhole className="text-[#8b1e3f]" size={18} aria-hidden="true" />
               <p className="mt-3 text-sm font-semibold text-[#1f2a24]">Frontend only</p>
               <p className="mt-2 text-sm leading-6 text-stone-600">
-                Validation and success states happen locally.
+                Credentials are validated locally for the demo flow.
               </p>
             </div>
             <div className="rounded-2xl border border-white/70 bg-white/70 p-4 shadow-sm backdrop-blur">
               <Gem className="text-[#8b1e3f]" size={18} aria-hidden="true" />
-              <p className="mt-3 text-sm font-semibold text-[#1f2a24]">Premium look</p>
+              <p className="mt-3 text-sm font-semibold text-[#1f2a24]">Premium UI</p>
               <p className="mt-2 text-sm leading-6 text-stone-600">
-                Warm tones, soft glass, and refined gold accents.
+                Responsive, polished, and consistent with the brand style.
               </p>
             </div>
           </div>
 
           <div className="mt-8 flex flex-wrap items-center gap-4 text-sm">
             <Link
-              href="/admin/login"
+              href="/admin/signup"
               className="inline-flex items-center gap-2 font-semibold text-[#8b1e3f] transition hover:text-[#6f1732]"
             >
-              Need admin access? Sign in
+              Create an admin account
               <ArrowRight size={16} aria-hidden="true" />
             </Link>
             <span className="text-stone-400">or</span>
-            <Link href="/products" className="font-semibold text-stone-700 transition hover:text-[#8b1e3f]">
-              Continue browsing products
+            <Link href="/login" className="font-semibold text-stone-700 transition hover:text-[#8b1e3f]">
+              Return to client sign in
             </Link>
           </div>
         </section>
@@ -191,18 +183,18 @@ export default function LoginPage() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#8b1e3f]">
-                  Client portal
+                  Admin portal
                 </p>
                 <h2 className="mt-3 text-2xl font-semibold text-[#1f2a24]">
-                  Sign in to your account
+                  Sign in to continue
                 </h2>
                 <p className="mt-3 text-sm leading-7 text-stone-600">
-                  Access your saved favorites, appointment history, and order
-                  details inside this demo flow.
+                  Use your admin demo credentials to open the private catalog
+                  management area.
                 </p>
               </div>
               <div className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#1f2a24] text-[#d7b56d] sm:flex">
-                <Gem size={22} aria-hidden="true" />
+                <Crown size={22} aria-hidden="true" />
               </div>
             </div>
 
@@ -217,19 +209,19 @@ export default function LoginPage() {
 
             <form className="mt-6 space-y-5" onSubmit={handleSubmit} noValidate>
               <Field
-                id="login-email"
+                id="admin-login-email"
                 label="Email"
                 type="email"
                 value={values.email}
                 onChange={(value) => updateField("email", value)}
                 autoComplete="email"
-                placeholder="you@example.com"
+                placeholder="admin@example.com"
                 error={errors.email}
-                icon={<Mail size={16} aria-hidden="true" />}
+                icon={<UserRound size={16} aria-hidden="true" />}
               />
 
               <Field
-                id="login-password"
+                id="admin-login-password"
                 label="Password"
                 type="password"
                 value={values.password}
@@ -243,7 +235,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,_#1f2a24,_#3a4b42)] px-5 py-3.5 text-sm font-semibold text-white shadow-[0_16px_30px_rgba(31,42,36,0.24)] transition hover:translate-y-[-1px] hover:shadow-[0_18px_36px_rgba(31,42,36,0.28)]"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,_#1f2a24,_#3a4b42)] px-5 py-3.5 text-sm font-semibold text-white shadow-[0_16px_30px_rgba(31,42,36,0.24)] transition hover:translate-y-[-1px] hover:shadow-[0_18px_36px_rgba(31,42,36,0.28)] disabled:cursor-not-allowed disabled:opacity-80"
               >
                 {isSubmitting ? "Signing in..." : "Sign in"}
                 <ArrowRight size={16} aria-hidden="true" />
@@ -251,9 +243,9 @@ export default function LoginPage() {
             </form>
 
             <p className="mt-6 text-sm leading-7 text-stone-600">
-              Looking for an admin demo account?{" "}
+              Need to create an admin demo account?{" "}
               <Link href="/admin/signup" className="font-semibold text-[#8b1e3f] hover:text-[#6f1732]">
-                Create one here
+                Sign up here
               </Link>
               .
             </p>
